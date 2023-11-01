@@ -89,6 +89,33 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": ""Press(behavior=2)"",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""InteractPress"",
+                    ""type"": ""Button"",
+                    ""id"": ""82b00ec9-561a-4f5a-80a3-b01d09fd4108"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Tap"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""InteractHold"",
+                    ""type"": ""Button"",
+                    ""id"": ""e888ab1b-ea40-4d58-9412-c3e0d8bbabd2"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Hold"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Inventory"",
+                    ""type"": ""Button"",
+                    ""id"": ""97461b55-5400-43c0-a5f4-eaa4ce1ac1c1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -333,6 +360,39 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""84d06d98-87a8-40f8-91ad-adc3467d795f"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""InteractPress"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5542744d-e460-4867-8ce9-5b58b802dbcd"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""InteractHold"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2973ca9b-e21e-48ea-ad2f-78282e494269"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Inventory"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -348,6 +408,9 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
         m_Player_Melee = m_Player.FindAction("Melee", throwIfNotFound: true);
         m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
+        m_Player_InteractPress = m_Player.FindAction("InteractPress", throwIfNotFound: true);
+        m_Player_InteractHold = m_Player.FindAction("InteractHold", throwIfNotFound: true);
+        m_Player_Inventory = m_Player.FindAction("Inventory", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -416,6 +479,9 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Melee;
     private readonly InputAction m_Player_Crouch;
     private readonly InputAction m_Player_Jump;
+    private readonly InputAction m_Player_InteractPress;
+    private readonly InputAction m_Player_InteractHold;
+    private readonly InputAction m_Player_Inventory;
     public struct PlayerActions
     {
         private @CustomInput m_Wrapper;
@@ -427,6 +493,9 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
         public InputAction @Melee => m_Wrapper.m_Player_Melee;
         public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
+        public InputAction @InteractPress => m_Wrapper.m_Player_InteractPress;
+        public InputAction @InteractHold => m_Wrapper.m_Player_InteractHold;
+        public InputAction @Inventory => m_Wrapper.m_Player_Inventory;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -457,6 +526,15 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
+            @InteractPress.started += instance.OnInteractPress;
+            @InteractPress.performed += instance.OnInteractPress;
+            @InteractPress.canceled += instance.OnInteractPress;
+            @InteractHold.started += instance.OnInteractHold;
+            @InteractHold.performed += instance.OnInteractHold;
+            @InteractHold.canceled += instance.OnInteractHold;
+            @Inventory.started += instance.OnInventory;
+            @Inventory.performed += instance.OnInventory;
+            @Inventory.canceled += instance.OnInventory;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -482,6 +560,15 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
+            @InteractPress.started -= instance.OnInteractPress;
+            @InteractPress.performed -= instance.OnInteractPress;
+            @InteractPress.canceled -= instance.OnInteractPress;
+            @InteractHold.started -= instance.OnInteractHold;
+            @InteractHold.performed -= instance.OnInteractHold;
+            @InteractHold.canceled -= instance.OnInteractHold;
+            @Inventory.started -= instance.OnInventory;
+            @Inventory.performed -= instance.OnInventory;
+            @Inventory.canceled -= instance.OnInventory;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -508,5 +595,8 @@ public partial class @CustomInput: IInputActionCollection2, IDisposable
         void OnMelee(InputAction.CallbackContext context);
         void OnCrouch(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+        void OnInteractPress(InputAction.CallbackContext context);
+        void OnInteractHold(InputAction.CallbackContext context);
+        void OnInventory(InputAction.CallbackContext context);
     }
 }

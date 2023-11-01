@@ -59,25 +59,7 @@ public class Weapon
 
     public void AddPart(WeaponPart weaponPart) 
     {
-        // Check is not null
-        if (weaponPart == null || weaponPart.partType == PartType.None)
-        {
-            return;
-        }
-        else
-        {
-            // Check parts
-            foreach (WeaponPart part in parts) 
-            {
-                if (part.partType == weaponPart.partType) 
-                {
-                    return;
-                }
-            }
-
-            // Add part
-            parts.Add(weaponPart);
-        }
+        parts.Add(weaponPart);
     }
 
     public void AddParts(WeaponPart[] weaponParts) 

@@ -2,34 +2,99 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PartType { None, Barrel, Upper, Lower, Magazine, Muzzle, Rest, Scope, Tactical }
-public enum PartRarity { None, Standard, Common, Uncommon, Rare, Legendary }
-public enum EffectTrigger { None, OnPrimary, WhilePrimary, EndPrimary, 
-                                  OnSecondary, WhileSecondary, EndSecondary,
-                                  OnReload, WhileReload, EndReload,
-                                  Fire, Aim, Reload}
-public enum PartEffect { None, TriggerPull, TriggerRelease, TriggerCharge, FireRay, FireProjectile, FireSingle, FireShot, Reload }
-
+public enum PartType
+{
+    None,
+    Barrel,
+    Muzzle,
+    Upper,
+    Lower,
+    Stock,
+    Sight
+}
+public enum PartRarity
+{
+    None,
+    Standard,
+    Common,
+    Uncommon,
+    Rare,
+    Legendary
+}
 public class WeaponPart
 {
     string title;
+    PartRarity rarity;
+    PartType type;
 
-    public PartType partType { get; private set; }
-    public PartRarity partRarity { get; private set; }
-    public PartEffect[] partEffects { get; private set; }
-    public EffectTrigger[] effectTriggers { get; private set; }
+    List<WeaponModifier> modifiers = new List<WeaponModifier>();
+    List<WeaponEffect> effects = new List<WeaponEffect>();
 
-    public WeaponPart(string _title, PartType _partType, PartRarity _partRarity, PartEffect[] _partEffects, EffectTrigger[] _effectTriggers) 
+    // Generate empty weaponPart
+    public WeaponPart() 
     {
-        title = _title;
-        partType = _partType;
-        partRarity = _partRarity;
-        partEffects = _partEffects;
-        effectTriggers = _effectTriggers;
+        title = "None";
+        rarity = PartRarity.None;
+        type = PartType.None;
     }
 
-    public virtual void PickUp() 
+    // Generate weaponPart of rarity
+    public WeaponPart(PartRarity _partRarity) 
     {
-
+        title = "None";
+        rarity = _partRarity;
+        type = PartType.None;
     }
+
+    // Generate weaponPart of type
+    public WeaponPart(PartType _partType)
+    {
+        title = "None";
+        rarity = PartRarity.None;
+        type = _partType;
+    }
+}
+
+enum Modifier
+{
+    None,
+    Damage,
+    RateOfFire,
+    ReloadSpeed,
+    AimSpeed,
+    CriticalMultiplier,
+    VerticalRecoil,
+    HorizontalRecoil,
+    AmmoReserve
+}
+public class WeaponModifier
+{
+    Modifier modifier;
+}
+
+public enum Effect
+{
+    None,
+    Ray,
+    Projectile,
+    SingleShot,
+    MultiShot,
+    ChargeShot,
+    MagazineReload,
+    SingleReload,
+    BeltAmmo
+}
+public enum Trigger
+{
+    None,
+    FireDown,
+    FireOn,
+    FireUp,
+    ReloadDown,
+    ReloadOn,
+    ReloadUp
+}
+public class WeaponEffect
+{
+
 }

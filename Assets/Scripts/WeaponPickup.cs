@@ -9,7 +9,12 @@ public class WeaponPickup : Pickup
 
     private void Start()
     {
-        weapon = new Weapon();
+        
+    }
+
+    public void setWeapon(Weapon w) 
+    {
+
     }
 
     public override void PickupObject(FPController fpcontroller) 
@@ -18,6 +23,13 @@ public class WeaponPickup : Pickup
 
         // Pass player the weapon mesh
 
+
+
         Destroy(this.gameObject);
+    }
+
+    public override void EquipObject(FPController fpcontroller)
+    {
+        
     }
 }

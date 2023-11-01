@@ -49,6 +49,11 @@ public class FPController : MonoBehaviour
     [SerializeField] FPWeaponController weaponController;
     Weapon weapon;
 
+    // Interactables
+    [SerializeField] GameObject inventoryCanvas;
+    GameObject interactable;
+    List<WeaponPart> weaponParts = new List<WeaponPart>();
+
     #endregion
 
     #region GameObject Functions
@@ -68,32 +73,21 @@ public class FPController : MonoBehaviour
 
     private void OnEnable()
     {
-        // Input System Management
-        input.Enable();
-
-        // Input init
-        input.Player.Jump.started += OnJumpStarted;
-        input.Player.Interact.started += OnInteractStarted;
-        input.Player.PrimaryFire.started += OnPrimaryStarted;
-        input.Player.PrimaryFire.canceled += OnPrimaryCanceled;
+        EnableInput();
     }
 
     private void OnDisable()
     {
-        // Input System Management
-        input.Disable();
-
-        // Input deinit
-        input.Player.Jump.started -= OnJumpStarted;
-        input.Player.Interact.started -= OnInteractStarted;
-        input.Player.PrimaryFire.started -= OnPrimaryStarted;
-        input.Player.PrimaryFire.canceled -= OnPrimaryCanceled;
+        DisableInput();
     }
 
     private void FixedUpdate()
     {
         // Physics based movement must be done in FixedUpdate
         PlayerMovement();
+
+        // Check if player is looking at interactable
+        InteractCheck();
     }
 
     private void Update()
@@ -106,14 +100,65 @@ public class FPController : MonoBehaviour
         SpeedControl();
     }
 
+    public bool addPartToInventory(WeaponPart weaponPart) 
+    {
+        if (weaponParts.Count >= 5)
+        {
+            return false;
+        }
+        else 
+        {
+            weaponParts.Add(weaponPart);
+            return true;
+        }
+    }
+
     #endregion
 
     #region Input Functions
+
+    private void EnableInput() 
+    {
+        // Input System Management
+        input.Enable();
+
+        // Input init
+        input.Player.Jump.started += OnJumpStarted;
+        input.Player.PrimaryFire.started += OnPrimaryStarted;
+        input.Player.PrimaryFire.canceled += OnPrimaryCanceled;
+
+        input.Player.InteractPress.started += OnInteractStarted;
+        input.Player.InteractPress.performed += OnInteractTap;
+        input.Player.InteractHold.performed += OnInteractHold;
+        input.Player.InteractPress.canceled += OnInteractCanceled;
+
+        input.Player.Inventory.performed += OnInventoryPerformed;
+    }
+
+    private void DisableInput() 
+    {
+        // Input System Management
+        input.Disable();
+
+        // Input deinit
+        input.Player.Jump.started -= OnJumpStarted;
+        input.Player.PrimaryFire.started -= OnPrimaryStarted;
+        input.Player.PrimaryFire.canceled -= OnPrimaryCanceled;
+
+        input.Player.InteractPress.started -= OnInteractStarted;
+        input.Player.InteractPress.performed -= OnInteractTap;
+        input.Player.InteractHold.performed -= OnInteractHold;
+        input.Player.InteractPress.canceled -= OnInteractCanceled;
+
+        input.Player.Inventory.performed -= OnInventoryPerformed;
+    }
 
     private void ProcessInput() 
     {
         // Movement
         movementInput = input.Player.Movement.ReadValue<Vector2>();
+
+        // Debug.Log("Interact: " + input.Player.Interact.ReadValue<float>());
     }
 
     private void OnJumpStarted(InputAction.CallbackContext value)
@@ -136,15 +181,76 @@ public class FPController : MonoBehaviour
 
     private void OnInteractStarted(InputAction.CallbackContext value) 
     {
+        Debug.Log("Interact Started");
+
+        // Raycast from camera
+
         // Raycast 
         RaycastHit hit;
-        if (Physics.Raycast(mainCamera.position, mainCamera.forward, out hit, 2.5f, notPlayer)) 
+        if (Physics.Raycast(mainCamera.position, mainCamera.forward, out hit, 2.5f, notPlayer))
         {
             // Try to get Pickup component
-            Pickup pickup = hit.transform.gameObject.GetComponent<Pickup>();   
+            Pickup pickup = hit.transform.gameObject.GetComponent<Pickup>();
 
-            if (pickup != null)
+            // Store pickup if found
+            if (pickup != null) 
+            {
                 Debug.Log("Interact object: " + pickup.gameObject.name);
+                interactable = pickup.gameObject;
+            }
+                
+        }
+    }
+
+    private void OnInteractCanceled(InputAction.CallbackContext value)
+    {
+        
+    }
+
+    private void OnInteractPerformed(InputAction.CallbackContext value) 
+    {
+        
+    }
+
+    private void OnInventoryPerformed(InputAction.CallbackContext value)
+    {
+        // Close Inventory
+        if (inventoryCanvas.activeSelf)
+        {
+            inventoryCanvas.SetActive(false);
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+        // Open Inventory
+        else 
+        {
+            inventoryCanvas.SetActive(true);
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+    }
+
+    private void OnInteractTap(InputAction.CallbackContext value)
+    {
+        if (interactable) 
+        {
+            Pickup pickup = interactable.GetComponent<Pickup>();
+            if (pickup) 
+            {
+                pickup.PickupObject(this);
+            }
+        }
+    }
+
+    private void OnInteractHold(InputAction.CallbackContext value) 
+    {
+        if (interactable)
+        {
+            Pickup pickup = interactable.GetComponent<Pickup>();
+            if (pickup)
+            {
+                pickup.EquipObject(this);
+            }
         }
     }
 
@@ -204,7 +310,27 @@ public class FPController : MonoBehaviour
         }
     }
 
-    
+    private void InteractCheck() 
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(mainCamera.position, mainCamera.forward, out hit, 2.5f, notPlayer))
+        {
+            // Try to get Pickup component
+            Pickup pickup = hit.transform.gameObject.GetComponent<Pickup>();
+
+            // Enable pickup/equip text
+            if (pickup != null)
+                ;
+            // Disable pickup/equip text
+            else
+                ;
+        }
+        // if not interacting
+        // Raycast from camera
+        // if object
+        // check if interactable
+        // if holding interact start timer
+    }
 
     private void PlayerMovement() 
     {
